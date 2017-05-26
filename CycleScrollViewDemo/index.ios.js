@@ -96,7 +96,13 @@ export default class CycleScrollViewDemo extends Component {
 
     //当一帧滚动结束的时候调用
     onAnimationEnd(e) {
-        
+        //偏移量
+        var offsetX = e.nativeEvent.contentOffset.x
+        //当前页数
+        var index = Math.floor(offsetX/SCREEN_WIDTH)
+        this.setState({
+            currentPageIndex:index
+        })
     }
 }
 
