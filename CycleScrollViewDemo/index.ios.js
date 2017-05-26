@@ -3,7 +3,6 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-
 import React, { Component } from 'react';
 import {
     StyleSheet,
@@ -14,28 +13,35 @@ import {
     Image
 } from 'react-native'
 // 引入计时器
-var TimerMiXin = require('react-timer-mixin')
+const TimerMiXin = require('react-timer-mixin');
 
-const SCREEN_WIDTH = require('Dimensions').get('window').width
-const ImageData = require('./ImageData.json')
+const SCREEN_WIDTH = require('Dimensions').get('window').width;
+const ImageData = require('./ImageData.json');
 
-export default class CycleScrollViewDemo extends Component {
+class CycleScrollViewDemo extends Component {
 
     //注册计时器
-    minXins: [TimerMiXin]
+    minXins: [TimerMiXin];
 
     constructor(props) {
-        super(props)
-    
+
+        super(props);
+
         this.state = {
             currentPageIndex:0
         }
     }
 
     render() {
+
+        let defaultProps = {
+            duration:1000
+        };
+
         return(
             <View style = {styles.container}>
                 <ScrollView
+                    ref="scrollView"
                     horizontal={true}
                     pagingEnabled={true}
                     bounces={false}
@@ -54,13 +60,15 @@ export default class CycleScrollViewDemo extends Component {
     }
     renderAllImage() {
         // 数组
-        var allImage = []
+        let allImage = [];
         for(let index in ImageData.data) {
-            let item = ImageData.data[index]
-            //创建组件 装入数组
-            allImage.push(
-                this.renderSigleImage(index,item)
-            )
+            if (ImageData.data.hasOwnProperty(index)) {
+                let item = ImageData.data[index];
+                //创建组件 装入数组
+                allImage.push(
+                    this.renderSigleImage(index, item)
+                )
+            }
         }
         return allImage
     }
@@ -78,28 +86,52 @@ export default class CycleScrollViewDemo extends Component {
     //返回所有圆点
     renderPageControl() {
         //定义一个数组，防止所有的圆点
-        var indicatorArr = []
-        var pageControlStyle
-        for (var i = 0; i < ImageData.data.length; i++) {
-            pageColor = (i==this.state.currentPageIndex) ? 'orange' : 'white'
+        let indicatorArr = [];
+        let pageControlStyle;
+        for (let i = 0; i < ImageData.data.length; i++) {
+            let pageColor = (i===this.state.currentPageIndex) ? 'orange' : 'white';
             indicatorArr.push(
                 <Text key={i} style={[{fontSize:37,marginLeft:8,color:pageColor}]}>&bull;</Text>
-            )
+            );
         }
-        return indicatorArr
+        return indicatorArr;
     }
 
+    //实现一些复杂的操作
     componentDidMount() {
         //开启定时器
+        this.startTimer()
+    }
+
+    // 开启定时器
+    startTimer() {
+        let scrollView = this.refs.scrollView;
+        let count = ImageData.data.length;
+        let activePage = 0;
+        setInterval(()=> {
+
+            if((this.state.currentPageIndex + 1 ) >= count) {//越界
+                activePage = 0;
+            }else {
+                activePage += 1;
+            }
+
+            //更新状态机
+            this.setState({currentPageIndex:activePage});
+            let offsetX = activePage * SCREEN_WIDTH;
+            scrollView.scrollResponderScrollTo({x:offsetX,y:0,animated:true});
+
+            console.log("1")
+        },1000);
 
     }
 
     //当一帧滚动结束的时候调用
     onAnimationEnd(e) {
         //偏移量
-        var offsetX = e.nativeEvent.contentOffset.x
+        let offsetX = e.nativeEvent.contentOffset.x;
         //当前页数
-        var index = Math.floor(offsetX/SCREEN_WIDTH)
+        let index = Math.floor(offsetX/SCREEN_WIDTH);
         this.setState({
             currentPageIndex:index
         })
@@ -122,6 +154,6 @@ const styles = StyleSheet.create({
         //设置侧轴方向对齐方式
         alignItems:'center'
     }
-})
+});
 
 AppRegistry.registerComponent('CycleScrollViewDemo', () => CycleScrollViewDemo);
