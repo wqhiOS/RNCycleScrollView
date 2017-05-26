@@ -18,10 +18,9 @@ const TimerMiXin = require('react-timer-mixin');
 const SCREEN_WIDTH = require('Dimensions').get('window').width;
 const ImageData = require('./ImageData.json');
 
-class CycleScrollViewDemo extends Component {
+var timer;
 
-    //注册计时器
-    minXins: [TimerMiXin];
+class CycleScrollViewDemo extends Component {
 
     constructor(props) {
 
@@ -47,6 +46,8 @@ class CycleScrollViewDemo extends Component {
                     bounces={false}
                     showsHorizontalScrollIndicator={false}
                     onMomentumScrollEnd={(e)=>this.onAnimationEnd(e)}
+                    onScrollBeginDrag={this.onScrollBeginDrag}
+                    onScrollEndDrag={this.myOnScrollEndDrag}
                     >
                     {this.renderAllImage()}
                 </ScrollView>
@@ -101,6 +102,7 @@ class CycleScrollViewDemo extends Component {
     componentDidMount() {
         //开启定时器
         this.startTimer()
+
     }
 
     // 开启定时器
@@ -108,20 +110,16 @@ class CycleScrollViewDemo extends Component {
         let scrollView = this.refs.scrollView;
         let count = ImageData.data.length;
         let activePage = 0;
-        setInterval(()=> {
 
-            if((this.state.currentPageIndex + 1 ) >= count) {//越界
+        timer = setInterval(()=>{
+            if ((this.state.currentPageIndex+1) >= count) {
                 activePage = 0;
             }else {
                 activePage += 1;
             }
-
-            //更新状态机
             this.setState({currentPageIndex:activePage});
             let offsetX = activePage * SCREEN_WIDTH;
             scrollView.scrollResponderScrollTo({x:offsetX,y:0,animated:true});
-
-            console.log("1")
         },1000);
 
     }
@@ -135,6 +133,15 @@ class CycleScrollViewDemo extends Component {
         this.setState({
             currentPageIndex:index
         })
+    }
+    onScrollBeginDrag() {
+        console.log('clear');
+        timer && clearTimeout(timer);
+    }
+
+    myOnScrollEndDrag() {
+        // console.log(this);
+        // this.startTimer();
     }
 }
 
