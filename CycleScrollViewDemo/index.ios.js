@@ -47,7 +47,7 @@ class CycleScrollViewDemo extends Component {
                     showsHorizontalScrollIndicator={false}
                     onMomentumScrollEnd={(e)=>this.onAnimationEnd(e)}
                     onScrollBeginDrag={this.onScrollBeginDrag}
-                    onScrollEndDrag={this.myOnScrollEndDrag}
+                    onScrollEndDrag={this.onScrollEndDrag.bind(this)}
                     >
                     {this.renderAllImage()}
                 </ScrollView>
@@ -115,7 +115,7 @@ class CycleScrollViewDemo extends Component {
             if ((this.state.currentPageIndex+1) >= count) {
                 activePage = 0;
             }else {
-                activePage += 1;
+                activePage = this.state.currentPageIndex + 1;
             }
             this.setState({currentPageIndex:activePage});
             let offsetX = activePage * SCREEN_WIDTH;
@@ -139,9 +139,9 @@ class CycleScrollViewDemo extends Component {
         timer && clearTimeout(timer);
     }
 
-    myOnScrollEndDrag() {
-        // console.log(this);
-        // this.startTimer();
+    onScrollEndDrag() {
+        console.log(this);
+        this.startTimer();
     }
 }
 
